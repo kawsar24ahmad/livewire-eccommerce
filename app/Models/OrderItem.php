@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Model;
 
 class OrderItem extends Model
@@ -17,4 +20,21 @@ class OrderItem extends Model
         'quantity',
         'subtotal',
     ];
+
+    protected function casts(){
+        return [
+            'price' => 'decimal:2',
+            'quantity' => 'integer',
+            'subtotal' => 'decimal:2'
+        ];
+    }
+    public function order(){
+        return $this->belongsTo(Order::class);
+    }
+    public function product(){
+        return $this->belongsTo(Product::class);
+    }
+    public function variant(){
+        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+    }
 }
