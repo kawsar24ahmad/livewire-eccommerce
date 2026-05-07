@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -18,21 +19,29 @@ class ProductsTable
     {
         return $table
             ->columns([
-                TextColumn::make('category_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('brand_id')
-                    ->numeric()
-                    ->sortable(),
+                ImageColumn::make('primaryImage.image_path')
+                    ->circular()
+                    ->defaultImageUrl(url('/images/placeholder.png')),
+
+
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('slug')
                     ->searchable(),
+                TextColumn::make('category.name')
+                    ->searchable()
+                    ->badge()
+                    ->color('info')
+                    ->sortable(),
+                TextColumn::make('brand.name')
+                     ->searchable()
+                    ->badge()
+                    ->sortable(),
                 TextColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
                 TextColumn::make('price')
-                    ->money()
+                    ->money('USD')
                     ->sortable(),
                 TextColumn::make('compare_price')
                     ->money()
@@ -43,11 +52,7 @@ class ProductsTable
                 TextColumn::make('stock_quantity')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('low_stock_threshold')
-                    ->numeric()
-                    ->sortable(),
-                IconColumn::make('manage_stock')
-                    ->boolean(),
+
                 TextColumn::make('stock_status')
                     ->badge(),
                 IconColumn::make('is_active')
@@ -56,19 +61,16 @@ class ProductsTable
                     ->boolean(),
                 IconColumn::make('has_variants')
                     ->boolean(),
-                TextColumn::make('weight')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('meta_title')
-                    ->searchable(),
+
                 TextColumn::make('sort_order')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('views_cont')
                     ->numeric()
+                    ->badge()
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    // ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')

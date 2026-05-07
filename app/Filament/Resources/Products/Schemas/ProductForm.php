@@ -46,7 +46,8 @@ class ProductForm
                                         Select::make('category_id')
                                             ->relationship('category', 'name')
                                             ->preload()
-                                            // ->searchable()
+                                            ->searchable()
+                                            ->native(false)
                                             ->required()
                                             ->createOptionForm([
                                                 TextInput::make('name')
@@ -59,6 +60,8 @@ class ProductForm
                                         Select::make('brand_id')
                                             ->relationship('brand', 'name')
                                             ->preload()
+                                            ->searchable()
+                                            ->native(false)
                                             ->required()
                                             ->createOptionForm([
                                                 TextInput::make('name')
