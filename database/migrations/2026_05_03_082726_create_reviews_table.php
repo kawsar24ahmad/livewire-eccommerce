@@ -15,14 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('order_id')->nullable()->constrained()->nullOnDelete();
             $table->integer('rating');
             $table->string('title')->nullable();
             $table->text('content')->nullable();
             $table->boolean('is_verified_purchase')->default(false);
             $table->boolean('is_approved')->default(false);
             $table->timestamps();
-            $table->unique('product_id', 'customer_id');
+            $table->unique(['product_id', 'customer_id']);
         });
     }
 

@@ -12,9 +12,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
+    use HasFactory;
+
     use SoftDeletes;
     protected $fillable = [
         'category_id',
@@ -48,7 +51,7 @@ class Product extends Model
             'weight' => 'decimal:2',
             'stock_quantity' => 'integer',
             'low_stock_threshold' => 'integer',
-            'views_cont' => 'integer',
+            'views_count' => 'integer',
             'manage_stock' => 'boolean',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
@@ -70,7 +73,7 @@ class Product extends Model
     }
     #[Scope]
     protected function lowStock(Builder $builder){
-        $builder->where('stock_status', 'low_stock_threshold')
+        return $builder->where('stock_status', 'low_stock_threshold')
             ->where('stock_quantity', '>', 0);
     }
     #[Scope]

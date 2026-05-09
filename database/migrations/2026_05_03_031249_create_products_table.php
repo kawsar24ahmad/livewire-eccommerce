@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->integer('sort_order')->default(0);
-            $table->integer('views_cont')->default(0);
+            $table->integer('views_count')->default(0);
 
             $table->timestamps();
             $table->softDeletes();

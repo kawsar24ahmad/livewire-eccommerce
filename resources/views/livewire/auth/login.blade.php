@@ -10,7 +10,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
-new #[Layout('components.layouts.auth')] class extends Component {
+new #[Layout('components.layouts.customer')] class extends Component {
     #[Validate('required|string|email')]
     public string $email = '';
 
@@ -28,7 +28,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        if (! Auth::guard('customer')->attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -39,7 +39,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('customer.dashboard', absolute: false), navigate: true);
     }
 
     /**
@@ -72,45 +73,121 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
-    <x-auth-header title="Log in to your account" description="Enter your email and password below to log in" />
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <a href="{{ route('home') }}" class="text-3xl font-bold text-blue-600">
+                    {{ config('app.name') }}
+                </a>
+                <h2 class="mt-6 text-3xl font-bold text-gray-900">
+                    Welcome back
+                </h2>
+                <p class="mt-2 text-sm text-gray-600">
+                    Don't have an account?
+                    <a href="{{ route('register') }}" class="font-medium text-blue-600 hover:text-indigo-500">
+                        Sign up
+                    </a>
+                </p>
+            </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+            <!-- Login Form -->
+            <div class="bg-white py-8 px-6 shadow-lg rounded-lg">
+                @if (session('status'))
+                    <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                        {{ session('status') }}
+                    </div>
+                @endif
 
-    <form wire:submit="login" class="flex flex-col gap-6">
-        <!-- Email Address -->
-        <flux:input wire:model="email" label="{{ __('Email address') }}" type="email" name="email" required autofocus autocomplete="email" placeholder="email@example.com" />
+                <form wire:submit="login">
 
-        <!-- Password -->
-        <div class="relative">
-            <flux:input
-                wire:model="password"
-                label="{{ __('Password') }}"
-                type="password"
-                name="password"
-                required
-                autocomplete="current-password"
-                placeholder="Password"
-            />
 
-            @if (Route::has('password.request'))
-                <x-text-link class="absolute right-0 top-0" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </x-text-link>
-            @endif
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address
+                        </label>
+                        <input id="email"
+                               type="email"
+                               wire:model="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               required
+                               autofocus
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        @error('email')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-4">
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                            Password
+                        </label>
+                        <input id="password"
+                               type="password"
+                               wire:model="password"
+                               name="password"
+                               required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        @error('password')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="flex items-center justify-between mb-6">
+                        <label class="flex items-center">
+                            <input type="checkbox"
+                                   name="remember"
+                                   wire:model="remember"
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-indigo-500">
+                            <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                        </label>
+
+                        <a href="{{ route('password.request') }}"
+                           class="text-sm font-medium text-blue-600 hover:text-indigo-500">
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit"
+                            class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition font-semibold">
+                        Sign In
+                    </button>
+                </form>
+
+                <!-- Social Login (Optional) -->
+                <div class="mt-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 grid grid-cols-2 gap-3">
+                        <a href="{{ route('home') }}"
+                           class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span>Google</span>
+                        </a>
+                        <a href="{{ route('home') }}"
+                           class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                            <span>Facebook</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Home -->
+            <p class="mt-6 text-center text-sm text-gray-600">
+                <a href="{{ route('home') }}" class="font-medium text-blue-600 hover:text-indigo-500">
+                    ← Back to Home
+                </a>
+            </p>
         </div>
-
-        <!-- Remember Me -->
-        <flux:checkbox wire:model="remember" label="{{ __('Remember me') }}" />
-
-        <div class="flex items-center justify-end">
-            <flux:button variant="primary" type="submit" class="w-full">{{ __('Log in') }}</flux:button>
-        </div>
-    </form>
-
-    <div class="space-x-1 text-center text-sm text-zinc-600 dark:text-zinc-400">
-        Don't have an account?
-        <x-text-link href="{{ route('register') }}">Sign up</x-text-link>
     </div>
-</div>

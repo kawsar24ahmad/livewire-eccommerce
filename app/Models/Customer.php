@@ -6,12 +6,14 @@ use App\Models\Order;
 use App\Models\Review;
 use App\Models\Address;
 use App\Models\CouponUsage;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\Scope;
-
-class Customer extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable;
+class Customer extends Authenticatable
 {
+    use HasFactory;
     protected $fillable = [
         'name',
         'email',
@@ -21,6 +23,7 @@ class Customer extends Model
         'date_of_birth',
         'gender',
         'is_active',
+        'remember_token'
     ];
 
     protected $hidden = [
