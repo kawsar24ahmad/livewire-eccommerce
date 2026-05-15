@@ -108,7 +108,7 @@ class Order extends Model
             }
         });
         static::created(function($order){
-            $this->orderStatuses()->create([
+            $order->orderStatuses()->create([
                 'status' => $order->status,
                 'notes' => 'Order Created',
                 // 'user_id' => $order->customer_id

@@ -30,7 +30,7 @@
             </flux:navlist>
 
             <!-- Desktop User Menu -->
-            {{-- <flux:dropdown position="bottom" align="start">
+            <flux:dropdown position="bottom" align="start">
                 <flux:profile
                     :name="auth()->user()->name"
                     :initials="auth()->user()->initials()"
@@ -72,7 +72,7 @@
                         </flux:menu.item>
                     </form>
                 </flux:menu>
-            </flux:dropdown> --}}
+            </flux:dropdown>
         </flux:sidebar>
 
         <!-- Mobile User Menu -->
@@ -81,7 +81,7 @@
 
             <flux:spacer />
 
-            {{-- <flux:dropdown position="top" align="end">
+            <flux:dropdown position="top" align="end">
                 <flux:profile
                     :initials="auth()->user()->initials()"
                     icon-trailing="chevron-down"
@@ -122,7 +122,7 @@
                         </flux:menu.item>
                     </form>
                 </flux:menu>
-            </flux:dropdown> --}}
+            </flux:dropdown>
         </flux:header>
 
         {{ $slot }}
