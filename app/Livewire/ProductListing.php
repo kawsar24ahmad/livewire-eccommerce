@@ -107,7 +107,7 @@ class ProductListing extends Component
             $query->whereBetween('price', [$min, $max]);
         }
         if ($this->featured) {
-            $query->featured;
+            $query->featured();
         }
 
         match ($this->sort) {
