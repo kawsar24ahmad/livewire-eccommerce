@@ -18,7 +18,9 @@ Route::get('/', Homepage::class)->name('home');
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
-
+Route::get('/link-storage', function () {
+    Artisan::call('storage:link');
+});
 
 Route::get('products', ProductListing::class)->name('products.index');
 Route::get('product/{slug}', ProductDetails::class)->name('products.show');
