@@ -11,6 +11,7 @@ use App\Livewire\Customer\Profile;
 use App\Livewire\Customer\Dashboard;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Customer\OrderDetails;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\CheckoutController;
 
 Route::get('/', Homepage::class)->name('home');
