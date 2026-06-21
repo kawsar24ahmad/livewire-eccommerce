@@ -127,7 +127,7 @@
         <!-- Announcement bar (optional) -->
         <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-sm">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2 text-center">
-                ðŸšš Free shipping on orders over $50 Â· Shop now and save big!
+                 Free shipping on orders over $50. Shop now and save big!
             </div>
         </div>
 
@@ -159,21 +159,21 @@
                 </div>
 
                 <!-- Search Bar (Desktop) -->
-                <div class="hidden lg:block flex-1 max-w-2xl mx-6">
+                {{-- <div class="hidden lg:block flex-1 max-w-2xl mx-6">
                     <livewire:search-bar />
-                </div>
+                </div> --}}
 
                 <!-- Right Side Actions -->
                 <div class="flex items-center gap-1 sm:gap-2">
                     <!-- Mobile Search Toggle -->
-                    <button type="button"
+                    {{-- <button type="button"
                             onclick="toggleMobileSearch()"
                             aria-label="Search"
                             class="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
                         </svg>
-                    </button>
+                    </button> --}}
 
                     @auth('customer')
                         <!-- Account (Desktop) -->
@@ -230,11 +230,11 @@
             </div>
 
             <!-- Mobile Search Expand -->
-            <div id="mobileSearch" class="mobile-search lg:hidden">
+            {{-- <div id="mobileSearch" class="mobile-search lg:hidden">
                 <div class="pb-3">
                     <livewire:search-bar />
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Desktop Navigation -->
             <nav class="hidden lg:block border-t border-gray-100 py-3">

@@ -22,11 +22,11 @@
                     @endif
 
                     @foreach($cart as $cartKey => $item)
-                        <div class="bg-white rounded-lg shadow-sm p-6">
-                            <div class="flex gap-4">
+                        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+                            <div class="flex flex-col sm:flex-row sm:gap-4">
                                 <!-- Product Image -->
-                                <div class="flex-shrink-0">
-                                    <div class="w-24 h-24 rounded-lg overflow-hidden bg-gray-100">
+                                <div class="flex-shrink-0 self-start sm:self-auto">
+                                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-100">
                                         @if($item['image'])
                                             <img src="{{ asset('storage/' . $item['image']) }}"
                                                  alt="{{ $item['name'] }}"
@@ -40,18 +40,31 @@
                                 </div>
 
                                 <!-- Product Info -->
-                                <div class="flex-1">
-                                    <h3 class="font-semibold text-gray-900 mb-1">{{ $item['name'] }}</h3>
-                                    @if($item['variant_name'])
-                                        <p class="text-sm text-gray-600 mb-2">{{ $item['variant_name'] }}</p>
-                                    @endif
-                                    <p class="text-lg font-bold text-blue-600">${{ number_format($item['price'], 2) }}</p>
+                                <div class="flex-1 mt-3 sm:mt-0 min-w-0">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div class="min-w-0">
+                                            <h3 class="font-semibold text-gray-900 mb-1 text-sm sm:text-base truncate">{{ $item['name'] }}</h3>
+                                            @if($item['variant_name'])
+                                                <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2 truncate">{{ $item['variant_name'] }}</p>
+                                            @endif
+                                            <p class="text-base sm:text-lg font-bold text-blue-600">${{ number_format($item['price'], 2) }}</p>
+                                        </div>
+
+                                        <!-- Mobile Remove Button -->
+                                        <button wire:click="removeItem('{{ $cartKey }}')"
+                                                class="sm:hidden text-red-600 hover:text-red-700 flex-shrink-0">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <!-- Quantity & Actions -->
-                                <div class="flex flex-col items-end justify-between">
+                                <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-between mt-4 sm:mt-0 gap-3 sm:gap-0">
+                                    <!-- Desktop Remove Button -->
                                     <button wire:click="removeItem('{{ $cartKey }}')"
-                                            class="text-red-600 hover:text-red-700">
+                                            class="hidden sm:block text-red-600 hover:text-red-700">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
@@ -64,7 +77,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                                             </svg>
                                         </button>
-                                        <span class="w-12 text-center font-medium">{{ $item['quantity'] }}</span>
+                                        <span class="w-10 sm:w-12 text-center font-medium text-sm sm:text-base">{{ $item['quantity'] }}</span>
                                         <button wire:click="updateQuantity('{{ $cartKey }}', {{ $item['quantity'] + 1 }})"
                                                 class="w-8 h-8 rounded border border-gray-300 hover:bg-gray-100 flex items-center justify-center">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +86,7 @@
                                         </button>
                                     </div>
 
-                                    <p class="text-lg font-bold text-gray-900">
+                                    <p class="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap">
                                         ${{ number_format($item['price'] * $item['quantity'], 2) }}
                                     </p>
                                 </div>
