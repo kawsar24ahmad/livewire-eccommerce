@@ -55,7 +55,7 @@
                             @foreach($gallery as $image)
                                 <button wire:click="selectImage('{{ $image->image_path }}')"
                                     class="aspect-square rounded-lg overflow-hidden border-2 transition
-                                                                                                                                                    {{ $selectedImage === $image->image_path ? 'border-blue-600' : 'border-gray-200 hover:border-indigo-400' }}">
+                                                                                                                                                                    {{ $selectedImage === $image->image_path ? 'border-blue-600' : 'border-gray-200 hover:border-indigo-400' }}">
                                     <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $product->name }}"
                                         class="w-full h-full object-cover">
                                 </button>
@@ -212,7 +212,7 @@
 
                                                     <button type="button" wire:click="selectVariant({{ $item->id }})" class="group relative border rounded-xl overflow-hidden bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 text-left
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {{ $selectedVariant == $item->id
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {{ $selectedVariant == $item->id
                                     ? 'ring-2 ring-blue-500 border-blue-500 shadow-lg'
                                     : 'border-gray-200 hover:border-blue-300' }}">
 
@@ -241,7 +241,7 @@
 
                                                                     @endif
                                                                 </div>
-                                                                <h1 class="font-semibold text-gray-900 text-sm mb-2 line-clamp-2">
+                                                                <h1 class="font-semibold text-gray-900 text-sm  line-clamp-2">
                                                                     {{ $variantTitle }}
                                                                 </h1>
 
@@ -262,51 +262,50 @@
                                                             @endif
 
                                                             {{-- Price --}}
-                                                            <div class="flex items-center gap-2 mb-3">
+                                                            {{-- <div class="flex items-center gap-2 mb-3">
 
                                                                 <span class="font-bold text-gray-900">
                                                                     ৳{{ number_format($item->price, 0) }}
                                                                 </span>
 
                                                                 @if($item->compare_price && $item->compare_price > $item->price)
-                                                                    <span class="text-xs text-gray-400 line-through">
-                                                                        ৳{{ number_format($item->compare_price, 0) }}
-                                                                    </span>
+                                                                <span class="text-xs text-gray-400 line-through">
+                                                                    ৳{{ number_format($item->compare_price, 0) }}
+                                                                </span>
                                                                 @endif
 
-                                                            </div>
+                                                            </div> --}}
 
                                                             {{-- Stock --}}
-                                                            @if($item->stock_quantity > 0)
+                                                            {{-- @if($item->stock_quantity > 0)
 
-                                                                <div class="flex items-center">
-                                                                    <span
-                                                                        class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">
+                                                            <div class="flex items-center">
+                                                                <span
+                                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">
 
-                                                                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                                                                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
 
-                                                                        In Stock
-                                                                        @if($item->stock_quantity <= 10)
-                                                                            ({{ $item->stock_quantity }})
+                                                                    In Stock
+                                                                    @if($item->stock_quantity <= 10) ({{ $item->stock_quantity }})
                                                                         @endif
 
-                                                                    </span>
-                                                                </div>
+                                                                </span>
+                                                            </div>
 
                                                             @else
 
-                                                                <div class="flex items-center">
-                                                                    <span
-                                                                        class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">
+                                                            <div class="flex items-center">
+                                                                <span
+                                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">
 
-                                                                        <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                                                                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
 
-                                                                        Out of Stock
+                                                                    Out of Stock
 
-                                                                    </span>
-                                                                </div>
+                                                                </span>
+                                                            </div>
 
-                                                            @endif
+                                                            @endif --}}
 
                                                         </div>
                                                     </button>
