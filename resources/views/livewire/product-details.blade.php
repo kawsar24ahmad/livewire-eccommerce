@@ -135,7 +135,7 @@ if ($variantImagePath) {
                     @endif
 
                     <!-- ============== Color picker ============== -->
-                    @if($product->has_variants && $product->variants->where('is_active', true)->pluck('color_id')->filter()->unique()->isNotEmpty())
+                    {{-- @if($product->has_variants && $product->variants->where('is_active', true)->pluck('color_id')->filter()->unique()->isNotEmpty())
                         @php
     $colorGroups = $product->variants
         ->where('is_active', true)
@@ -164,10 +164,10 @@ if ($variantImagePath) {
                                 <p class="text-xs text-gray-500 mt-2">Selected: <span class="font-semibold text-gray-700">{{ $variant->color->name }}</span></p>
                             @endif
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- ============== Size picker (drives variant) ============== -->
-                    @if($product->has_variants && $product->variants->where('is_active', true)->pluck('size_id')->filter()->unique()->isNotEmpty())
+                    {{-- @if($product->has_variants && $product->variants->where('is_active', true)->pluck('size_id')->filter()->unique()->isNotEmpty())
                         @php
     $sizeGroups = $product->variants
         ->where('is_active', true)
@@ -229,7 +229,7 @@ if ($variantImagePath) {
                                 </div>
                             </div>
                         @endif
-                    @endif
+                    @endif --}}
 
                     @if($product->has_variants && $product->variants->where('is_active', true)->count())
                         <div class="mb-8">
