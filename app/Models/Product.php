@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Size;
 use App\Models\Brand;
 use App\Models\Review;
 use App\Models\Category;
@@ -43,7 +44,8 @@ class Product extends Model
         'sort_order',
         'views_cont',
     ];
-    protected function casts(){
+    protected function casts()
+    {
         return [
             'price' => 'decimal:2',
             'compare_price' => 'decimal:2',
@@ -59,89 +61,110 @@ class Product extends Model
         ];
     }
     #[Scope]
-    protected function active(Builder $builder){
+    protected function active(Builder $builder)
+    {
         $builder->where('is_active', true);
     }
     #[Scope]
-    protected function featured(Builder $builder){
+    protected function featured(Builder $builder)
+    {
         $builder->where('is_featured', true);
     }
     #[Scope]
-    protected function inStock(Builder $builder){
+    protected function inStock(Builder $builder)
+    {
         $builder->where('stock_status', 'in_stock')
             ->where('stock_quantity', '>', 0);
     }
     #[Scope]
-    protected function lowStock(Builder $builder){
+    protected function lowStock(Builder $builder)
+    {
         return $builder->where('stock_status', 'low_stock_threshold')
             ->where('stock_quantity', '>', 0);
     }
     #[Scope]
-    protected function inCategory(Builder $builder, int $categoryId){
+    protected function inCategory(Builder $builder, int $categoryId)
+    {
         $builder->where('category_id', $categoryId);
     }
     #[Scope]
-    protected function ofBrand(Builder $builder, int $brandId){
+    protected function ofBrand(Builder $builder, int $brandId)
+    {
         $builder->where('brand', $brandId);
     }
     #[Scope]
-    protected function inPriceRange(Builder $builder,float $min, float $max){
+    protected function inPriceRange(Builder $builder, float $min, float $max)
+    {
         $builder->whereBetween('price', [$min, $max]);
     }
     // relationships
-    public function category()  {
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
-    public function brand()  {
+    public function sizes()
+    {
+        return $this->belongsToMany(Size::class);
+    }
+    public function brand()
+    {
         return $this->belongsTo(Brand::class);
     }
-    public function variants()  {
+    public function variants()
+    {
         return $this->hasMany(ProductVariant::class);
     }
-    public function images()  {
+    public function images()
+    {
         return $this->hasMany(ProductImage::class);
     }
-    public function primaryImage()  {
+    public function primaryImage()
+    {
         return $this->hasOne(ProductImage::class)->where('is_primary', true);
     }
-    public function reviews()  {
+    public function reviews()
+    {
         return $this->hasMany(Review::class);
     }
-    public function approvedReviews()  {
+    public function approvedReviews()
+    {
         return $this->hasMany(Review::class)->where('is_approved', true);
     }
     // helper methods
-    public function getDiscountPercentageAttribute()  {
+    public function getDiscountPercentageAttribute()
+    {
         if ($this->compare_price && $this->compare_price > $this->price) {
             return round((($this->compare_price - $this->price) / $this->compare_price) * 100);
         }
         return 0;
     }
-    public function getAverageRatingAttribute()  {
+    public function getAverageRatingAttribute()
+    {
         return $this->approvedReviews()->avg('rating') ?? 0;
     }
-    public function getReviewsCountAttribute()  {
+    public function getReviewsCountAttribute()
+    {
         return $this->approvedReviews()->count();
     }
-    public function incrementViews()  {
+    public function incrementViews()
+    {
         $this->increment('views_count');
     }
-    protected static function boot(){
+    protected static function boot()
+    {
         parent::boot();
-        static::creating(function($product){
+        static::creating(function ($product) {
             if (empty($product->slug)) {
                 $product->slug = Str::slug($product->name);
             }
             if (empty($product->sku)) {
-                $product->sku = 'SKU-'. Str::random(8);
+                $product->sku = 'SKU-' . Str::random(8);
             }
         });
-        static::updating(function($product){
+        static::updating(function ($product) {
             if ($product->isDirty('name') && empty($product->slug)) {
                 $product->slug = Str::slug($product->name);
             }
-
         });
     }
-
 }

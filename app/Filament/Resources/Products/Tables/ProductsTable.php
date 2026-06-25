@@ -33,10 +33,10 @@ class ProductsTable
                     ->badge()
                     ->color('info')
                     ->sortable(),
-                TextColumn::make('brand.name')
-                     ->searchable()
-                    ->badge()
-                    ->sortable(),
+                // TextColumn::make('brand.name')
+                //      ->searchable()
+                //     ->badge()
+                //     ->sortable(),
                 TextColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),
@@ -59,13 +59,13 @@ class ProductsTable
                     ->boolean(),
                 IconColumn::make('is_featured')
                     ->boolean(),
-                IconColumn::make('has_variants')
-                    ->boolean(),
+                // IconColumn::make('has_variants')
+                //     ->boolean(),
 
                 TextColumn::make('sort_order')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('views_cont')
+                TextColumn::make('views_count')
                     ->numeric()
                     ->badge()
                     ->sortable(),

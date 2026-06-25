@@ -32,47 +32,47 @@ class OrdersTable
                 TextColumn::make('coupon.name')
                     ->numeric()
                     ->sortable(),
-                // TextColumn::make('subtotal')
-                //     ->numeric()
-                //     ->sortable(),
+                TextColumn::make('subtotal')
+                    ->numeric()
+                    ->sortable(),
                 TextColumn::make('discount_amount')
                     ->numeric()
                     ->sortable(),
-                // TextColumn::make('shipping_cost')
-                //     ->money()
-                //     ->sortable(),
+                TextColumn::make('shipping_cost')
+                    ->money('BDT')
+                    ->sortable(),
                 // TextColumn::make('tax_amount')
                 //     ->numeric()
                 //     ->sortable(),
                 TextColumn::make('total')
                     ->numeric()
                     ->sortable(),
-                // TextColumn::make('shipping_full_name')
-                //     ->searchable(),
-                // TextColumn::make('shipping_phone')
-                //     ->searchable(),
-                // TextColumn::make('shipping_address_line_1')
-                //     ->searchable(),
-                // TextColumn::make('shipping_address_line_2')
-                //     ->searchable(),
-                // TextColumn::make('shipping_city')
-                //     ->searchable(),
-                // TextColumn::make('shipping_state')
-                //     ->searchable(),
-                // TextColumn::make('shipping_postal_code')
-                //     ->searchable(),
-                // TextColumn::make('shipping_country')
-                //     ->searchable(),
-                // IconColumn::make('is_default')
-                //     ->boolean(),
-                // TextColumn::make('type')
-                //     ->badge(),
-                // TextColumn::make('payment_method')
-                //     ->badge(),
+                TextColumn::make('shipping_full_name')
+                    ->searchable(),
+                TextColumn::make('shipping_phone')
+                    ->searchable(),
+                TextColumn::make('shipping_address_line_1')
+                    ->searchable(),
+                TextColumn::make('shipping_address_line_2')
+                    ->searchable(),
+                TextColumn::make('shipping_city')
+                    ->searchable(),
+                TextColumn::make('shipping_state')
+                    ->searchable(),
+                TextColumn::make('shipping_postal_code')
+                    ->searchable(),
+                TextColumn::make('shipping_country')
+                    ->searchable(),
+                IconColumn::make('is_default')
+                    ->boolean(),
+                TextColumn::make('type')
+                    ->badge(),
+                TextColumn::make('payment_method')
+                    ->badge(),
                 TextColumn::make('payment_status')
                     ->searchable(),
-                // TextColumn::make('transaction_id')
-                //     ->searchable(),
+                TextColumn::make('transaction_id')
+                    ->searchable(),
                 TextColumn::make('status')
                     ->badge(),
                 TextColumn::make('items_count')

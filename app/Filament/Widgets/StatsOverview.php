@@ -10,6 +10,11 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StatsOverview extends StatsOverviewWidget
 {
+    public static function canView(): bool
+    {
+        return ! auth()->user()?->hasRole('staff');
+    }
+
     protected function getStats(): array
     {
         $totalRevenue = Order::where('payment_status', 'paid')->sum('total');

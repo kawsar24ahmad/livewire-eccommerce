@@ -2,20 +2,29 @@
 
 namespace App\Filament\Resources\Orders;
 
-use App\Filament\Resources\Orders\Pages\CreateOrder;
+use UnitEnum;
+use BackedEnum;
+use App\Models\Order;
+use Filament\Tables\Table;
+use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
+use Filament\Support\Icons\Heroicon;
+use Filament\Schemas\Components\Section;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\Orders\Pages\EditOrder;
+use App\Filament\Resources\Orders\Pages\ViewOrder;
 use App\Filament\Resources\Orders\Pages\ListOrders;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\Orders\Pages\CreateOrder;
+
+
+// use Filament\Schemas\Schema;
 use App\Filament\Resources\Orders\Schemas\OrderForm;
 use App\Filament\Resources\Orders\Tables\OrdersTable;
-use App\Models\Order;
-use BackedEnum;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use UnitEnum;
+use App\Filament\Resources\Orders\Schemas\OrderInfolist;
+// use Filament\Infolists\Components\Section;
+
 
 class OrderResource extends Resource
 {
@@ -29,6 +38,10 @@ class OrderResource extends Resource
     {
         return OrderForm::configure($schema);
     }
+public static function infolist(Schema $schema): Schema
+{
+   return OrderInfolist::configure($schema);
+}
 
     public static function table(Table $table): Table
     {
@@ -47,6 +60,7 @@ class OrderResource extends Resource
         return [
             'index' => ListOrders::route('/'),
             'create' => CreateOrder::route('/create'),
+            'view' => ViewOrder::route('/{record}'),
             'edit' => EditOrder::route('/{record}/edit'),
         ];
     }
