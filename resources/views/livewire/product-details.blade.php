@@ -38,20 +38,20 @@
                     </div>
 
                     @php
-                        $variantImagePath = $selectedVariant
-                            ? $product->variants->find($selectedVariant)?->image_path
-                            : null;
+$variantImagePath = $selectedVariant
+    ? $product->variants->find($selectedVariant)?->image_path
+    : null;
 
-                        if ($variantImagePath) {
-                            // Convert Eloquent Collection to a base Collection so we can push a stdClass
-                            // without triggering Eloquent's getKey() duplicate detection.
-                            $gallery = $product->images->toBase()->push((object) [
-                                'image_path' => $variantImagePath,
-                                'is_primary' => true,
-                            ]);
-                        } else {
-                            $gallery = $product->images;
-                        }
+if ($variantImagePath) {
+    // Convert Eloquent Collection to a base Collection so we can push a stdClass
+    // without triggering Eloquent's getKey() duplicate detection.
+    $gallery = $product->images->toBase()->push((object) [
+        'image_path' => $variantImagePath,
+        'is_primary' => true,
+    ]);
+} else {
+    $gallery = $product->images;
+}
                     @endphp
 
                     @if($gallery->count() > 1)
@@ -137,10 +137,10 @@
                     <!-- ============== Color picker ============== -->
                     @if($product->has_variants && $product->variants->where('is_active', true)->pluck('color_id')->filter()->unique()->isNotEmpty())
                         @php
-                            $colorGroups = $product->variants
-                                ->where('is_active', true)
-                                ->filter(fn($v) => $v->color_id)
-                                ->groupBy('color_id');
+    $colorGroups = $product->variants
+        ->where('is_active', true)
+        ->filter(fn($v) => $v->color_id)
+        ->groupBy('color_id');
                         @endphp
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-900 mb-3">Color:</label>
@@ -148,8 +148,8 @@
                                 @foreach($colorGroups as $colorId => $group)
                                     @php $color = $group->first()->color; @endphp
                                     @php
-                                        // Prefer the first variant in this color group whose image is set, or first variant
-                                        $rep = $group->firstWhere('image_path', '!=', null) ?? $group->first();
+        // Prefer the first variant in this color group whose image is set, or first variant
+        $rep = $group->firstWhere('image_path', '!=', null) ?? $group->first();
                                     @endphp
                                     <button type="button"
                                             wire:click="selectVariant({{ $rep->id }})"
@@ -169,10 +169,10 @@
                     <!-- ============== Size picker (drives variant) ============== -->
                     @if($product->has_variants && $product->variants->where('is_active', true)->pluck('size_id')->filter()->unique()->isNotEmpty())
                         @php
-                            $sizeGroups = $product->variants
-                                ->where('is_active', true)
-                                ->filter(fn($v) => $v->size_id)
-                                ->groupBy('size_id');
+    $sizeGroups = $product->variants
+        ->where('is_active', true)
+        ->filter(fn($v) => $v->size_id)
+        ->groupBy('size_id');
                         @endphp
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-900 mb-3">Size:</label>
@@ -180,16 +180,16 @@
                                 @foreach($sizeGroups as $sizeId => $group)
                                     @php $size = $group->first()->size; @endphp
                                     @php
-                                        // For a given size, try to find a variant matching currently-selected color first
-                                        $match = $group->firstWhere('color_id', $variant?->color_id)
-                                            ?? $group->first();
+        // For a given size, try to find a variant matching currently-selected color first
+        $match = $group->firstWhere('color_id', $variant?->color_id)
+            ?? $group->first();
                                     @endphp
                                     <button type="button"
                                             wire:click="selectVariant({{ $match->id }})"
                                             class="px-4 py-2 border rounded-lg text-sm transition
                                                 {{ $selectedSize === $sizeId
-                                                    ? 'bg-blue-600 text-white border-blue-600'
-                                                    : 'border-gray-300 hover:border-blue-400' }}">
+            ? 'bg-blue-600 text-white border-blue-600'
+            : 'border-gray-300 hover:border-blue-400' }}">
                                         {{ $size->name }}
                                     </button>
                                 @endforeach
@@ -231,6 +231,87 @@
                         @endif
                     @endif
 
+                    @if($product->has_variants && $product->variants->where('is_active', true)->count())
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                                Available Variants
+                            </h3>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                @foreach($product->variants->where('is_active', true) as $item)
+                                                    <button type="button" wire:click="selectVariant({{ $item->id }})" class="group relative border rounded-xl overflow-hidden bg-white transition-all duration-200 hover:shadow-lg
+                                                                {{ $selectedVariant == $item->id
+                                    ? 'ring-2 ring-blue-500 border-blue-500'
+                                    : 'border-gray-200 hover:border-blue-300' }}">
+
+                                                        {{-- Variant Image --}}
+                                                        <div class="aspect-square bg-gray-100 overflow-hidden">
+                                                            <img src="{{ $item->image_path
+                                    ? asset('storage/' . $item->image_path)
+                                    : asset('images/no-image.png') }}" alt="{{ $item->display_label }}"
+                                                                class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                                        </div>
+
+                                                        {{-- Content --}}
+                                                        <div class="p-3 text-left">
+
+                                                            {{-- Color --}}
+                                                            <div class="flex items-center gap-2 mb-2">
+                                                                <span class="w-4 h-4 rounded-full border"
+                                                                    style="background: {{ $item->color?->hex_code ?? '#ddd' }}">
+                                                                </span>
+
+                                                                <span class="text-sm font-medium text-gray-800">
+                                                                    {{ $item->color?->name }}
+                                                                </span>
+                                                            </div>
+
+                                                            {{-- Size --}}
+                                                            <div class="mb-2">
+                                                                <span class="inline-flex items-center px-2 py-1 rounded bg-gray-100 text-xs font-medium">
+                                                                    Size: {{ $item->size?->name }}
+                                                                </span>
+                                                            </div>
+
+                                                            {{-- Price --}}
+                                                            <div class="flex items-center gap-2 mb-2">
+                                                                <span class="font-semibold text-gray-900">
+                                                                    ৳{{ number_format($item->price) }}
+                                                                </span>
+
+                                                                @if($item->compare_price)
+                                                                    <span class="text-sm text-gray-400 line-through">
+                                                                        ৳{{ number_format($item->compare_price) }}
+                                                                    </span>
+                                                                @endif
+                                                            </div>
+
+                                                            {{-- Stock --}}
+                                                            @if($item->stock_quantity > 0)
+                                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
+                                                                    In Stock ({{ $item->stock_quantity }})
+                                                                </span>
+                                                            @else
+                                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-700">
+                                                                    Out of Stock
+                                                                </span>
+                                                            @endif
+                                                        </div>
+
+                                                        {{-- Selected Badge --}}
+                                                        @if($selectedVariant == $item->id)
+                                                            <div class="absolute top-2 right-2">
+                                                                <div class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                                                                    Selected
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     <!-- ============== Quantity ============== -->
                     <div class="my-6">
                         <label class="block text-sm font-medium text-gray-900 mb-3">Quantity:</label>
@@ -263,8 +344,8 @@
                             @disabled($product->stock_status !== 'in_stock')
                             class="w-full py-3 px-6 rounded-lg font-semibold text-lg transition
                                 {{ $product->stock_status === 'in_stock'
-                                    ? 'bg-blue-600 text-white hover:bg-indigo-700'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}">
+    ? 'bg-blue-600 text-white hover:bg-indigo-700'
+    : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}">
                         {{ $product->stock_status === 'in_stock' ? 'Add to Cart' : 'Out of Stock' }}
                     </button>
 
