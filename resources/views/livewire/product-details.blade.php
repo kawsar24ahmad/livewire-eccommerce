@@ -9,7 +9,7 @@
                 <li><a href="{{ route('products.index') }}" class="text-gray-500 hover:text-blue-600">Shop</a></li>
                 <li class="text-gray-400">/</li>
                 <li><a href="{{ route('products.index', ['category' => $product->category->slug]) }}"
-                       class="text-gray-500 hover:text-blue-600">{{ $product->category->name }}</a></li>
+                        class="text-gray-500 hover:text-blue-600">{{ $product->category->name }}</a></li>
                 <li class="text-gray-400">/</li>
                 <li class="text-gray-900 font-medium">{{ $product->name }}</li>
             </ol>
@@ -20,49 +20,44 @@
 
                 <!-- ================= Images ================= -->
                 <div>
-                    <div x-data="{ hover:false, x:50, y:50 }"
-                         @mouseenter="hover = true"
-                         @mouseleave="hover = false"
-                         @mousemove="
+                    <div x-data="{ hover:false, x:50, y:50 }" @mouseenter="hover = true" @mouseleave="hover = false"
+                        @mousemove="
                             const rect = $el.getBoundingClientRect();
                             x = (($event.clientX - rect.left) / rect.width) * 100;
                             y = (($event.clientY - rect.top) / rect.height) * 100;
-                         "
-                         class="aspect-square overflow-hidden rounded-xl cursor-zoom-in bg-gray-100">
+                         " class="aspect-square overflow-hidden rounded-xl cursor-zoom-in bg-gray-100">
                         <img src="{{ $selectedImage ? asset('storage/' . $selectedImage) : 'https://via.placeholder.com/600' }}"
-                             alt="{{ $product->name }}"
-                             class="w-full h-full object-cover transition-transform duration-200"
-                             :style="hover
+                            alt="{{ $product->name }}"
+                            class="w-full h-full object-cover transition-transform duration-200" :style="hover
                                 ? `transform: scale(2.5); transform-origin: ${x}% ${y}%`
                                 : 'transform: scale(1)'">
                     </div>
 
                     @php
-$variantImagePath = $selectedVariant
-    ? $product->variants->find($selectedVariant)?->image_path
-    : null;
+                        $variantImagePath = $selectedVariant
+                            ? $product->variants->find($selectedVariant)?->image_path
+                            : null;
 
-if ($variantImagePath) {
-    // Convert Eloquent Collection to a base Collection so we can push a stdClass
-    // without triggering Eloquent's getKey() duplicate detection.
-    $gallery = $product->images->toBase()->push((object) [
-        'image_path' => $variantImagePath,
-        'is_primary' => true,
-    ]);
-} else {
-    $gallery = $product->images;
-}
+                        if ($variantImagePath) {
+                            // Convert Eloquent Collection to a base Collection so we can push a stdClass
+                            // without triggering Eloquent's getKey() duplicate detection.
+                            $gallery = $product->images->toBase()->push((object) [
+                                'image_path' => $variantImagePath,
+                                'is_primary' => true,
+                            ]);
+                        } else {
+                            $gallery = $product->images;
+                        }
                     @endphp
 
                     @if($gallery->count() > 1)
                         <div class="grid grid-cols-4 gap-4 mt-4">
                             @foreach($gallery as $image)
                                 <button wire:click="selectImage('{{ $image->image_path }}')"
-                                        class="aspect-square rounded-lg overflow-hidden border-2 transition
-                                            {{ $selectedImage === $image->image_path ? 'border-blue-600' : 'border-gray-200 hover:border-indigo-400' }}">
-                                    <img src="{{ asset('storage/' . $image->image_path) }}"
-                                         alt="{{ $product->name }}"
-                                         class="w-full h-full object-cover">
+                                    class="aspect-square rounded-lg overflow-hidden border-2 transition
+                                                                                                                                                    {{ $selectedImage === $image->image_path ? 'border-blue-600' : 'border-gray-200 hover:border-indigo-400' }}">
+                                    <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $product->name }}"
+                                        class="w-full h-full object-cover">
                                 </button>
                             @endforeach
                         </div>
@@ -74,7 +69,8 @@ if ($variantImagePath) {
                     <!-- Badges -->
                     <div class="flex flex-wrap gap-2 mb-4">
                         @if($product->is_featured)
-                            <span class="bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded">Featured</span>
+                            <span
+                                class="bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded">Featured</span>
                         @endif
                         <span class="bg-{{ $product->stock_status === 'in_stock' ? 'green' : 'red' }}-100
                                      text-{{ $product->stock_status === 'in_stock' ? 'green' : 'red' }}-800
@@ -94,13 +90,20 @@ if ($variantImagePath) {
                             <div class="flex text-yellow-400">
                                 @for($i = 1; $i <= 5; $i++)
                                     @if($i <= floor($product->average_rating))
-                                        <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                        <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                                            <path
+                                                d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                        </svg>
                                     @else
-                                        <svg class="w-5 h-5 fill-current text-gray-300" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                        <svg class="w-5 h-5 fill-current text-gray-300" viewBox="0 0 20 20">
+                                            <path
+                                                d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                        </svg>
                                     @endif
                                 @endfor
                             </div>
-                            <span class="text-gray-600">{{ number_format($product->average_rating, 1) }} ({{ $product->reviews_count }} reviews)</span>
+                            <span class="text-gray-600">{{ number_format($product->average_rating, 1) }}
+                                ({{ $product->reviews_count }} reviews)</span>
                         </div>
                     @endif
 
@@ -109,9 +112,11 @@ if ($variantImagePath) {
                         @php $variant = $selectedVariant ? $product->variants->find($selectedVariant) : null; @endphp
                         @if($variant)
                             <div class="flex items-center gap-3">
-                                <span class="text-3xl font-bold text-gray-900">${{ number_format($variant->price, 2) }}</span>
+                                <span
+                                    class="text-3xl font-bold text-gray-900">${{ number_format($variant->price, 2) }}</span>
                                 @if($variant->compare_price)
-                                    <span class="text-xl text-gray-500 line-through">${{ number_format($variant->compare_price, 2) }}</span>
+                                    <span
+                                        class="text-xl text-gray-500 line-through">${{ number_format($variant->compare_price, 2) }}</span>
                                     <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">
                                         -{{ $variant->discount_percentage }}%
                                     </span>
@@ -119,9 +124,11 @@ if ($variantImagePath) {
                             </div>
                         @else
                             <div class="flex items-center gap-3">
-                                <span class="text-3xl font-bold text-gray-900">${{ number_format($product->price, 2) }}</span>
+                                <span
+                                    class="text-3xl font-bold text-gray-900">${{ number_format($product->price, 2) }}</span>
                                 @if($product->compare_price)
-                                    <span class="text-xl text-gray-500 line-through">${{ number_format($product->compare_price, 2) }}</span>
+                                    <span
+                                        class="text-xl text-gray-500 line-through">${{ number_format($product->compare_price, 2) }}</span>
                                     <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-semibold">
                                         -{{ $product->discount_percentage }}%
                                     </span>
@@ -134,215 +141,220 @@ if ($variantImagePath) {
                         <p class="text-gray-600 mb-6">{{ $product->short_description }}</p>
                     @endif
 
-                    <!-- ============== Color picker ============== -->
-                    {{-- @if($product->has_variants && $product->variants->where('is_active', true)->pluck('color_id')->filter()->unique()->isNotEmpty())
-                        @php
-    $colorGroups = $product->variants
-        ->where('is_active', true)
-        ->filter(fn($v) => $v->color_id)
-        ->groupBy('color_id');
-                        @endphp
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-900 mb-3">Color:</label>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($colorGroups as $colorId => $group)
-                                    @php $color = $group->first()->color; @endphp
-                                    @php
-        // Prefer the first variant in this color group whose image is set, or first variant
-        $rep = $group->firstWhere('image_path', '!=', null) ?? $group->first();
-                                    @endphp
-                                    <button type="button"
-                                            wire:click="selectVariant({{ $rep->id }})"
-                                            title="{{ $color->name }}"
-                                            class="w-9 h-9 rounded-full border-2 transition flex items-center justify-center
-                                                {{ $selectedVariant === $rep->id ? 'border-blue-600 ring-2 ring-blue-200' : 'border-gray-300 hover:border-gray-500' }}"
-                                            style="background-color: {{ $color->hex_code ?? '#ccc' }};">
-                                    </button>
-                                @endforeach
-                            </div>
-                            @if($variant?->color)
-                                <p class="text-xs text-gray-500 mt-2">Selected: <span class="font-semibold text-gray-700">{{ $variant->color->name }}</span></p>
-                            @endif
-                        </div>
-                    @endif --}}
+                    @php
+                        $sizeGroups = $product->variants
+                            ->where('is_active', true)
+                            ->filter(fn($v) => $v->size_id)
+                            ->groupBy('size_id');
 
-                    <!-- ============== Size picker (drives variant) ============== -->
-                    {{-- @if($product->has_variants && $product->variants->where('is_active', true)->pluck('size_id')->filter()->unique()->isNotEmpty())
-                        @php
-    $sizeGroups = $product->variants
-        ->where('is_active', true)
-        ->filter(fn($v) => $v->size_id)
-        ->groupBy('size_id');
-                        @endphp
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-900 mb-3">Size:</label>
-                            <div class="flex flex-wrap gap-2">
-                                @foreach($sizeGroups as $sizeId => $group)
-                                    @php $size = $group->first()->size; @endphp
-                                    @php
-        // For a given size, try to find a variant matching currently-selected color first
-        $match = $group->firstWhere('color_id', $variant?->color_id)
-            ?? $group->first();
-                                    @endphp
-                                    <button type="button"
-                                            wire:click="selectVariant({{ $match->id }})"
-                                            class="px-4 py-2 border rounded-lg text-sm transition
-                                                {{ $selectedSize === $sizeId
-            ? 'bg-blue-600 text-white border-blue-600'
-            : 'border-gray-300 hover:border-blue-400' }}">
-                                        {{ $size->name }}
-                                    </button>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <!-- Size chart (only for the sizes actually offered) -->
-                        @php $offeredSizes = $sizeGroups->map(fn($g) => $g->first()->size); @endphp
-                        @if($offeredSizes->whereNotNull('chest')->isNotEmpty() || $offeredSizes->whereNotNull('length')->isNotEmpty())
-                            <div class="my-6 overflow-x-auto">
-                                <div class="rounded-xl border border-gray-200 shadow-sm bg-white">
-                                    <div class="bg-blue-500 text-white text-center py-3 font-semibold rounded-t-xl">Size Chart</div>
-                                    <table class="w-full text-sm text-center border-collapse">
-                                        <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
-                                            <tr>
-                                                <th class="p-3 text-left bg-gray-100">SIZE</th>
-                                                @foreach($offeredSizes as $size)
-                                                    <th class="p-3">{{ $size->name }}</th>
-                                                @endforeach
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-gray-100">
-                                            <tr>
-                                                <th class="p-3 text-left font-medium text-gray-700 bg-gray-100">CHEST</th>
-                                                @foreach($offeredSizes as $size)
-                                                    <td class="p-3">{{ $size->chest ?? '-' }}</td>
-                                                @endforeach
-                                            </tr>
-                                            <tr>
-                                                <th class="p-3 text-left font-medium text-gray-700 bg-gray-100">LENGTH</th>
-                                                @foreach($offeredSizes as $size)
-                                                    <td class="p-3">{{ $size->length ?? '-' }}</td>
-                                                @endforeach
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        $offeredSizes = $sizeGroups->map(fn($g) => $g->first()->size);
+                        $sizeGroups = $product->variants
+                            ->where('is_active', true)
+                            ->filter(fn($v) => $v->size_id)
+                            ->groupBy('size_id');
+                    @endphp
+                    @if($offeredSizes->whereNotNull('chest')->isNotEmpty() || $offeredSizes->whereNotNull('length')->isNotEmpty())
+                        <div class="my-6 overflow-x-auto">
+                            <div class="rounded-xl border border-gray-200 shadow-sm bg-white">
+                                <div class="bg-blue-500 text-white text-center py-3 font-semibold rounded-t-xl">Size Chart
                                 </div>
+                                <table class="w-full text-sm text-center border-collapse">
+                                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+                                        <tr>
+                                            <th class="p-3 text-left bg-gray-100">SIZE</th>
+                                            @foreach($offeredSizes as $size)
+                                                <th class="p-3">{{ $size->name }}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        <tr>
+                                            <th class="p-3 text-left font-medium text-gray-700 bg-gray-100">CHEST</th>
+                                            @foreach($offeredSizes as $size)
+                                                <td class="p-3">{{ $size->chest ?? '-' }}</td>
+                                            @endforeach
+                                        </tr>
+                                        <tr>
+                                            <th class="p-3 text-left font-medium text-gray-700 bg-gray-100">LENGTH</th>
+                                            @foreach($offeredSizes as $size)
+                                                <td class="p-3">{{ $size->length ?? '-' }}</td>
+                                            @endforeach
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                        @endif
-                    @endif --}}
+                        </div>
+                    @endif
 
                     @if($product->has_variants && $product->variants->where('is_active', true)->count())
+
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                                Available Variants
+                                Available Options
                             </h3>
 
                             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
                                 @foreach($product->variants->where('is_active', true) as $item)
-                                                    <button type="button" wire:click="selectVariant({{ $item->id }})" class="group relative border rounded-xl overflow-hidden bg-white transition-all duration-200 hover:shadow-lg
-                                                                {{ $selectedVariant == $item->id
-                                    ? 'ring-2 ring-blue-500 border-blue-500'
+
+                                                    @php
+                                                        $variantTitle = collect([
+                                                            $item->color?->name,
+                                                            $item->size?->name,
+                                                        ])->filter()->implode(' • ');
+
+                                                        $variantTitle = $variantTitle ?: 'Standard Product';
+
+                                                        $image = $item->image_path
+                                                            ? asset('storage/' . $item->image_path)
+                                                            : null;
+                                                    @endphp
+
+                                                    <button type="button" wire:click="selectVariant({{ $item->id }})" class="group relative border rounded-xl overflow-hidden bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 text-left
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {{ $selectedVariant == $item->id
+                                    ? 'ring-2 ring-blue-500 border-blue-500 shadow-lg'
                                     : 'border-gray-200 hover:border-blue-300' }}">
 
-                                                        {{-- Variant Image --}}
-                                                        <div class="aspect-square bg-gray-100 overflow-hidden">
-                                                            <img src="{{ $item->image_path
-                                    ? asset('storage/' . $item->image_path)
-                                    : asset('images/no-image.png') }}" alt="{{ $item->display_label }}"
-                                                                class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                                        </div>
+                                                        {{-- Image --}}
+                                                        @if ($image)
+                                                            <div class="aspect-square bg-gray-100 overflow-hidden">
+                                                                <img src="{{ $image }}" alt="{{ $variantTitle }}"
+                                                                    class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+                                                            </div>
+                                                        @endif
+
+
+
 
                                                         {{-- Content --}}
-                                                        <div class="p-3 text-left">
+                                                        <div class="p-3">
 
-                                                            {{-- Color --}}
-                                                            <div class="flex items-center gap-2 mb-2">
-                                                                <span class="w-4 h-4 rounded-full border"
-                                                                    style="background: {{ $item->color?->hex_code ?? '#ddd' }}">
-                                                                </span>
+                                                            {{-- Variant Name --}}
+                                                            <div class=" flex gap-2">
+                                                                <div class="flex items-center gap-2 mb-2">
+                                                                    @if($item->color)
+                                                                        <span class="w-4 h-4 rounded-full border border-gray-300"
+                                                                            style="background-color: {{ $item->color->hex_code ?? '#ddd' }}">
+                                                                        </span>
 
-                                                                <span class="text-sm font-medium text-gray-800">
-                                                                    {{ $item->color?->name }}
-                                                                </span>
+
+                                                                    @endif
+                                                                </div>
+                                                                <h1 class="font-semibold text-gray-900 text-sm mb-2 line-clamp-2">
+                                                                    {{ $variantTitle }}
+                                                                </h1>
+
                                                             </div>
 
-                                                            {{-- Size --}}
-                                                            <div class="mb-2">
-                                                                <span class="inline-flex items-center px-2 py-1 rounded bg-gray-100 text-xs font-medium">
-                                                                    Size: {{ $item->size?->name }}
-                                                                </span>
-                                                            </div>
+
+
+
+
+                                                            {{-- Standard Product --}}
+                                                            @if(!$item->color && !$item->size)
+                                                                <div class="mb-2">
+                                                                    <span
+                                                                        class="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs">
+                                                                        Standard Product
+                                                                    </span>
+                                                                </div>
+                                                            @endif
 
                                                             {{-- Price --}}
-                                                            <div class="flex items-center gap-2 mb-2">
-                                                                <span class="font-semibold text-gray-900">
-                                                                    ৳{{ number_format($item->price) }}
+                                                            <div class="flex items-center gap-2 mb-3">
+
+                                                                <span class="font-bold text-gray-900">
+                                                                    ৳{{ number_format($item->price, 0) }}
                                                                 </span>
 
-                                                                @if($item->compare_price)
-                                                                    <span class="text-sm text-gray-400 line-through">
-                                                                        ৳{{ number_format($item->compare_price) }}
+                                                                @if($item->compare_price && $item->compare_price > $item->price)
+                                                                    <span class="text-xs text-gray-400 line-through">
+                                                                        ৳{{ number_format($item->compare_price, 0) }}
                                                                     </span>
                                                                 @endif
+
                                                             </div>
 
                                                             {{-- Stock --}}
                                                             @if($item->stock_quantity > 0)
-                                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
-                                                                    In Stock ({{ $item->stock_quantity }})
-                                                                </span>
-                                                            @else
-                                                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-700">
-                                                                    Out of Stock
-                                                                </span>
-                                                            @endif
-                                                        </div>
 
-                                                        {{-- Selected Badge --}}
-                                                        @if($selectedVariant == $item->id)
-                                                            <div class="absolute top-2 right-2">
-                                                                <div class="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                                                                    Selected
+                                                                <div class="flex items-center">
+                                                                    <span
+                                                                        class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">
+
+                                                                        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+
+                                                                        In Stock
+                                                                        @if($item->stock_quantity <= 10)
+                                                                            ({{ $item->stock_quantity }})
+                                                                        @endif
+
+                                                                    </span>
                                                                 </div>
-                                                            </div>
-                                                        @endif
+
+                                                            @else
+
+                                                                <div class="flex items-center">
+                                                                    <span
+                                                                        class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">
+
+                                                                        <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+
+                                                                        Out of Stock
+
+                                                                    </span>
+                                                                </div>
+
+                                                            @endif
+
+                                                        </div>
                                                     </button>
+
                                 @endforeach
+
                             </div>
                         </div>
+
                     @endif
+
+
 
                     <!-- ============== Quantity ============== -->
                     <div class="my-6">
                         <label class="block text-sm font-medium text-gray-900 mb-3">Quantity:</label>
                         <div class="flex items-center gap-3">
                             <button wire:click="decrementQuantity" type="button"
-                                    class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">
+                                class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 12H4" />
                                 </svg>
                             </button>
                             <input type="number" wire:model="quantity" min="1"
-                                   class="w-20 text-center border border-gray-300 rounded-lg py-2">
+                                class="w-20 text-center border border-gray-300 rounded-lg py-2">
                             <button wire:click="incrementQuantity" type="button"
-                                    class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">
+                                class="w-10 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 flex items-center justify-center">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
                                 </svg>
                             </button>
                         </div>
                     </div>
 
                     @if(session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">{{ session('success') }}</div>
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                            {{ session('success') }}
+                        </div>
                     @endif
                     @if(session('error'))
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{{ session('error') }}</div>
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {{ session('error') }}
+                        </div>
                     @endif
 
-                    <button wire:click="addToCart"
-                            @disabled($product->stock_status !== 'in_stock')
-                            class="w-full py-3 px-6 rounded-lg font-semibold text-lg transition
+                    <button wire:click="addToCart" @disabled($product->stock_status !== 'in_stock') class="w-full py-3 px-6 rounded-lg font-semibold text-lg transition
                                 {{ $product->stock_status === 'in_stock'
     ? 'bg-blue-600 text-white hover:bg-indigo-700'
     : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}">
@@ -358,7 +370,7 @@ if ($variantImagePath) {
                         <div class="flex justify-between">
                             <span class="text-gray-600">Category:</span>
                             <a href="{{ route('products.index', ['category' => $product->category->slug]) }}"
-                               class="font-medium text-blue-600 hover:text-indigo-700">{{ $product->category->name }}</a>
+                                class="font-medium text-blue-600 hover:text-indigo-700">{{ $product->category->name }}</a>
                         </div>
 
                     </div>
@@ -371,11 +383,12 @@ if ($variantImagePath) {
             <div class="border-b">
                 <nav class="flex">
                     <button @click="activeTab = 'description'"
-                            :class="{ 'border-blue-600 text-blue-600': activeTab === 'description' }"
-                            class="px-6 py-4 border-b-2 font-medium transition">Description</button>
+                        :class="{ 'border-blue-600 text-blue-600': activeTab === 'description' }"
+                        class="px-6 py-4 border-b-2 font-medium transition">Description</button>
                     <button @click="activeTab = 'reviews'"
-                            :class="{ 'border-blue-600 text-blue-600': activeTab === 'reviews' }"
-                            class="px-6 py-4 border-b-2 font-medium transition">Reviews ({{ $product->reviews_count }})</button>
+                        :class="{ 'border-blue-600 text-blue-600': activeTab === 'reviews' }"
+                        class="px-6 py-4 border-b-2 font-medium transition">Reviews
+                        ({{ $product->reviews_count }})</button>
                 </nav>
             </div>
             <div class="p-8">
@@ -389,7 +402,8 @@ if ($variantImagePath) {
                                 <div class="border-b pb-6 last:border-b-0">
                                     <div class="flex items-start gap-4">
                                         <div class="flex-shrink-0">
-                                            <div class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                                            <div
+                                                class="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                                                 {{ substr($review->customer->name, 0, 1) }}
                                             </div>
                                         </div>
@@ -397,23 +411,33 @@ if ($variantImagePath) {
                                             <div class="flex items-center gap-2 mb-2">
                                                 <h4 class="font-semibold">{{ $review->customer->name }}</h4>
                                                 @if($review->is_verified_purchase)
-                                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Verified Purchase</span>
+                                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Verified
+                                                        Purchase</span>
                                                 @endif
                                             </div>
                                             <div class="flex items-center gap-2 mb-2">
                                                 <div class="flex text-yellow-400">
                                                     @for($i = 1; $i <= 5; $i++)
                                                         @if($i <= $review->rating)
-                                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                                                                <path
+                                                                    d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                                            </svg>
                                                         @else
-                                                            <svg class="w-4 h-4 fill-current text-gray-300" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                                                            <svg class="w-4 h-4 fill-current text-gray-300" viewBox="0 0 20 20">
+                                                                <path
+                                                                    d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                                                            </svg>
                                                         @endif
                                                     @endfor
                                                 </div>
-                                                <span class="text-sm text-gray-500">{{ $review->created_at->diffForHumans() }}</span>
+                                                <span
+                                                    class="text-sm text-gray-500">{{ $review->created_at->diffForHumans() }}</span>
                                             </div>
-                                            @if($review->title)<h5 class="font-medium mb-2">{{ $review->title }}</h5>@endif
-                                            @if($review->comment)<p class="text-gray-700">{{ $review->comment }}</p>@endif
+                                            @if($review->title)
+                                            <h5 class="font-medium mb-2">{{ $review->title }}</h5>@endif
+                                            @if($review->comment)
+                                            <p class="text-gray-700">{{ $review->comment }}</p>@endif
                                         </div>
                                     </div>
                                 </div>
@@ -431,7 +455,7 @@ if ($variantImagePath) {
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Related Products</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach($relatedProducts as $relatedProduct)
-                        <livewire:product-card :product="$relatedProduct" :key="'related-' . $relatedProduct->id"/>
+                        <livewire:product-card :product="$relatedProduct" :key="'related-' . $relatedProduct->id" />
                     @endforeach
                 </div>
             </section>

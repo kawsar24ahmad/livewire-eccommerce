@@ -133,20 +133,10 @@
                             </div>
                         </div>
 
-                        @auth('customer')
-                            <a href="{{ route('checkout') }}"
-                               class="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg hover:bg-indigo-700 transition font-semibold">
-                                Proceed to Checkout
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}"
-                               class="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg hover:bg-indigo-700 transition font-semibold">
-                                Login to Checkout
-                            </a>
-                            <p class="text-sm text-gray-600 text-center mt-3">
-                                Or <a href="{{ route('register') }}" class="text-blue-600 hover:text-indigo-700">create an account</a>
-                            </p>
-                        @endauth
+                        <a href="{{ route('checkout') }}"
+                            class="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg hover:bg-indigo-700 transition font-semibold">
+                            Proceed to Checkout
+                        </a>
 
                         <!-- Trust Badges -->
                         <div class="mt-6 pt-6 border-t">

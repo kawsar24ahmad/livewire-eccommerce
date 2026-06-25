@@ -77,16 +77,25 @@ class CheckoutPage extends Component
     public function mount()
     {
         $this->cart = session()->get('cart', []);
+
         if (empty($this->cart)) {
             return redirect()->route('cart.index');
         }
-        // Pre-fill with customer data
-        $customer = auth('customer')->user();
-        $this->full_name = $customer->name;
-        $this->phone = $customer->phone ?? '';
-        $defaultAddress = $customer->addresses()->where('is_default', true)->first();
-        if ($defaultAddress) {
-            $this->selectedAddressId = $defaultAddress->id;
+
+        if (auth('customer')->check()) {
+
+            $customer = auth('customer')->user();
+
+            $this->full_name = $customer->name ?? '';
+            $this->phone = $customer->phone ?? '';
+
+            $defaultAddress = $customer->addresses()
+                ->where('is_default', true)
+                ->first();
+
+            if ($defaultAddress) {
+                $this->selectedAddressId = $defaultAddress->id;
+            }
         }
     }
     public function nextStep()
@@ -196,7 +205,7 @@ class CheckoutPage extends Component
             $total = $subtotal + $shippingCost + $taxAmount - $discountAmount;
 
             $order = Order::create([
-                'customer_id' => auth('customer')->id(),
+                'customer_id' => auth('customer')->id() ?? null,
                 'coupon_id' => $this->appliedCoupon?->id,
                 'subtotal' => $subtotal,
                 'discount_amount' => $discountAmount,
@@ -283,16 +292,23 @@ class CheckoutPage extends Component
         }
         return $this->appliedCoupon->calculateDiscount($this->getSubtotal());
     }
+
     public function render()
     {
-        $addresses = auth("customer")->user()->addresses;
-        // dd($addresses);
+        $addresses = collect();
+
+        if (auth('customer')->check()) {
+            $addresses = auth('customer')->user()->addresses;
+        }
+
         return view('livewire.checkout-page', [
             'addresses' => $addresses,
             'subtotal' => $this->getSubtotal(),
             'shippingCost' => $this->getShippingCost(),
             'discountAmount' => $this->getDiscountAmount(),
-            'total' => $this->getSubtotal() + $this->getShippingCost() - $this->getDiscountAmount(),
+            'total' => $this->getSubtotal()
+                + $this->getShippingCost()
+                - $this->getDiscountAmount(),
         ])->layout('components.layouts.frontend');
     }
 }
