@@ -10,12 +10,13 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Tabs;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\ColorPicker;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Forms\Components\ColorPicker;
 use Filament\Infolists\Components\TextEntry;
 
 class ProductForm
@@ -38,15 +39,53 @@ class ProductForm
                                             ->unique(ignoreRecord: true)
                                             ->visibleOn('edit')
                                             ->required(),
-                                        Select::make('category_id')
+                                        // Select::make('category_id')
+                                        //     ->relationship('category', 'name')
+                                        //     ->preload()->searchable()->native(false)->required()
+                                        //     ->createOptionForm([
+                                        //         TextInput::make('name')->required(),
+                                        //         TextInput::make('slug')
+                                        //             ->unique(ignoreRecord: true)
+                                        //             ->readOnly()
+                                        //             ->visibleOn('edit'),
+                                        //     ]),
+
+
+                                      Select::make('category_id')
                                             ->relationship('category', 'name')
-                                            ->preload()->searchable()->native(false)->required()
+                                            ->searchable()
+                                            ->preload()
+                                            ->native(false)
+                                            ->allowHtml()
+                                            ->required()
+                                            ->getOptionLabelFromRecordUsing(function (Model $record) {
+
+                                                if ($record->image) {
+                                                    return '
+                                                        <div style="display:flex;align-items:center;gap:10px;">
+                                                            <img
+                                                                src="' . asset('storage/' . $record->image) . '"
+                                                                style="
+                                                                    width:20px;
+                                                                    height:20px;
+                                                                    border-radius:6px;
+                                                                    object-fit:cover;
+                                                                "
+                                                            >
+                                                            <span>' . e($record->name) . '</span>
+                                                        </div>
+                                                    ';
+                                                }
+
+                                                return e($record->name);
+                                            })
                                             ->createOptionForm([
                                                 TextInput::make('name')->required(),
                                                 TextInput::make('slug')
                                                     ->unique(ignoreRecord: true)
                                                     ->readOnly()
                                                     ->visibleOn('edit'),
+                                                FileUpload::make('image'),
                                             ]),
 
                                     ]),
@@ -199,6 +238,29 @@ class ProductForm
                                                     ->label('Color')
                                                     ->relationship('color', 'name')
                                                     ->searchable()->preload()->native(false)
+                                                    ->native(false)
+    ->allowHtml()
+    ->getOptionLabelFromRecordUsing(function (Model $record) {
+
+        return '
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span
+                    style="
+                        width:18px;
+                        height:18px;
+                        border-radius:9999px;
+                        background:' . $record->hex_code . ';
+                        border:1px solid #d1d5db;
+                        display:inline-block;
+                    ">
+                </span>
+
+                <span>' . e($record->name) . '</span>
+
+
+            </div>
+        ';
+    })
                                                     ->createOptionForm([
                                                         TextInput::make('name')->required(),
                                                         ColorPicker::make('hex_code')
