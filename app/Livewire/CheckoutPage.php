@@ -5,10 +5,10 @@ namespace App\Livewire;
 use App\Models\Order;
 use App\Models\Coupon;
 use App\Models\Address;
+use App\Models\Customer;
 use App\Models\Setting;
 use Livewire\Component;
 use App\Models\OrderItem;
-use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
 use Stripe\Checkout\Session as StripeSession;
 use Stripe\Stripe;
@@ -16,18 +16,15 @@ use Stripe\Stripe;
 class CheckoutPage extends Component
 {
     public $cart = [];
-    public $step = 1;
+
     // Address fields
     public $useExistingAddress = false;
     public $selectedAddressId = null;
     public $full_name = '';
     public $phone = '';
     public $address_line_1 = '';
-    public $address_line_2 = '';
-    public $city = '';
-    public $state = '';
-    public $postal_code = '';
-    public $country = 'US';
+    public $shipping_area = 'inside_dhaka';
+
     public $customerNotes = '';
     public $paymentMethod = 'stripe';
 
@@ -40,23 +37,15 @@ class CheckoutPage extends Component
             return $item['price'] * $item['quantity'];
         }, $this->cart));
     }
+
     public function getShippingCost()
     {
-        $subtotal = $this->getSubtotal();
-        $freeShippingThreshold = Setting::get('free_shipping_threshold', 100);
-        $flatRate = Setting::get('flat_shipping_rate', 10);
+        if ($this->shipping_area === 'inside_dhaka') {
+            return Setting::get('shipping_cost_inside_dhaka', 60);
+        }
+        return Setting::get('shipping_cost_outside_dhaka', 120);
+    }
 
-        if ($freeShippingThreshold && $subtotal >= $freeShippingThreshold) {
-            return 0;
-        }
-        return  $flatRate;
-    }
-    public function previousStep()
-    {
-        if ($this->step > 1) {
-            $this->step--;
-        }
-    }
     public function validateAddress()
     {
         if (!$this->useExistingAddress) {
@@ -64,16 +53,15 @@ class CheckoutPage extends Component
                 'full_name' => 'required|string|max:255',
                 'phone' => 'required|string|max:255',
                 'address_line_1' => 'required|string|max:255',
-                'city' => 'required|string|max:255',
-                'postal_code' => 'required|string|max:20',
-                'country' => 'required|string|max:2',
+                'shipping_area' => 'required|string|in:inside_dhaka,outside_dhaka',
             ]);
         } else {
             if (!$this->selectedAddressId) {
-                throw new \Exception('Please select an address');
+                throw new \Exception('Please select a delivery address.');
             }
         }
     }
+
     public function mount()
     {
         $this->cart = session()->get('cart', []);
@@ -83,129 +71,85 @@ class CheckoutPage extends Component
         }
 
         if (auth('customer')->check()) {
-
             $customer = auth('customer')->user();
-
             $this->full_name = $customer->name ?? '';
             $this->phone = $customer->phone ?? '';
 
-            $defaultAddress = $customer->addresses()
-                ->where('is_default', true)
-                ->first();
-
+            $defaultAddress = $customer->addresses()->where('is_default', true)->first();
             if ($defaultAddress) {
+                $this->useExistingAddress = true;
                 $this->selectedAddressId = $defaultAddress->id;
+            } elseif ($customer->addresses()->count() > 0) {
+                $this->useExistingAddress = true;
+                $this->selectedAddressId = $customer->addresses()->first()->id;
             }
         }
     }
-    public function nextStep()
-    {
-        if ($this->step == 1) {
-            $this->validateAddress();
-            $this->step = 2;
-        } elseif ($this->step == 2) {
-            $this->step = 3;
-        }
-    }
-    public function processStripePayment($order)
-    {
-        Stripe::setApiKey(config('services.stripe.secret'));
-        $lineItems = [];
-        foreach ($order->items as $item) {
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'usd',
-                    'product_data' => [
-                        'name' => $item->product_name . ($item->variant_name ? ' - ' . $item->variant_name : ''),
-                    ],
-                    'unit_amount' => $item->price * 100,
-                ],
-                'quantity' => $item->quantity
-            ];
-        }
-        // Add shipping
-        if ($order->shipping_cost > 0) {
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'usd',
-                    'product_data' => [
-                        'name' => 'Shipping',
-                    ],
-                    'unit_amount' => $order->shipping_cost * 100,
-                ],
-                'quantity' => 1,
-            ];
-        }
-        if ($order->shipping_cost > 0) {
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'usd',
-                    'product_data' => [
-                        'name' => 'Shipping',
-                    ],
-                    'unit_amount' => $order->shipping_cost * 100,
-                ],
-                'quantity' => 1,
-            ];
-        }
 
-        $session = StripeSession::create([
-            'payment_method_types' => ['card'],
-            'line_items' => $lineItems,
-            'mode' => 'payment',
-            'success_url' => route('checkout.success', ['order' => $order->id]) . '?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => route('checkout.cancel', ['order' => $order->id]),
-            'customer_email' => auth('customer')->user()->email,
-            'metadata' => [
-                'order_id' => $order->id,
-            ],
-
-        ]);
-
-        $order->update([
-            'transaction_id' => $session->id
-        ]);
-        return redirect($session->url);
-    }
     public function placeOrder()
     {
         try {
-            DB::beginTransaction();
-            // Get shipping address
-            if ($this->useExistingAddress && $this->selectedAddressId) {
+            $this->validateAddress();
 
-                $address = Address::find($this->selectedAddressId);
-                $shippingData = [
-                    'shipping_full_name' => $address->full_name,
-                    'shipping_phone' => $address->phone,
-                    'shipping_address_line_1' => $address->address_line_1,
-                    'shipping_address_line_2' => $address->address_line_2,
-                    'shipping_city' => $address->city,
-                    'shipping_state' => $address->state,
-                    'shipping_postal_code' => $address->postal_code,
-                    'shipping_country' => $address->country,
-                ];
+            DB::beginTransaction();
+
+            $customerId = null;
+
+            // 1. Structure the shipping data consistently
+            $shippingData = [
+                'shipping_full_name' => $this->useExistingAddress && $this->selectedAddressId && auth("customer")->check()
+                    ? Address::find($this->selectedAddressId)->full_name
+                    : $this->full_name,
+                'shipping_phone' => $this->useExistingAddress && $this->selectedAddressId && auth("customer")->check()
+                    ? Address::find($this->selectedAddressId)->phone
+                    : $this->phone,
+                'shipping_address_line_1' => $this->useExistingAddress && $this->selectedAddressId && auth("customer")->check()
+                    ? Address::find($this->selectedAddressId)->address_line_1
+                    : $this->address_line_1,
+            ];
+
+            // 2. Handle Logged-in vs Guest Customer Logic
+            if (auth("customer")->check()) {
+                $customerId = auth('customer')->id();
+
+                if (!$this->useExistingAddress || !$this->selectedAddressId) {
+                    $customer = auth("customer")->user();
+                    $customer->addresses()->where('is_default', 1)->update(['is_default' => 0]);
+                    $customer->addresses()->create([
+                        'full_name' => $this->full_name,
+                        'phone' => $this->phone,
+                        'address_line_1' => $this->address_line_1,
+                        'is_default' => 1,
+                    ]);
+                }
             } else {
-                $shippingData = [
-                    'shipping_full_name' => $this->full_name,
-                    'shipping_phone' => $this->phone,
-                    'shipping_address_line_1' => $this->address_line_1,
-                    'shipping_address_line_2' => $this->address_line_2,
-                    'shipping_city' => $this->city,
-                    'shipping_state' => $this->state,
-                    'shipping_postal_code' => $this->postal_code,
-                    'shipping_country' => $this->country,
-                ];
+                // Create Guest Customer account
+                $customer = Customer::create([
+                    'name' => $this->full_name,
+                    'phone' => $this->phone,
+                    'is_active' => 0,
+                ]);
+
+                $customerId = $customer->id; // Assign the newly created guest ID to the order
+
+                $customer->addresses()->create([
+                    'full_name' => $this->full_name,
+                    'phone' => $this->phone,
+                    'address_line_1' => $this->address_line_1,
+                    'is_default' => 1,
+                ]);
             }
-            // Calculate totals
+
+            // 3. Calculate Totals
             $subtotal = $this->getSubtotal();
             $shippingCost = $this->getShippingCost();
             $discountAmount = $this->getDiscountAmount();
-            $taxAmount = 0; // You can calculate tax here if needed
+            $taxAmount = 0;
             $total = $subtotal + $shippingCost + $taxAmount - $discountAmount;
 
+            // 4. Create Order (Using the verified $customerId)
             $order = Order::create([
-                'customer_id' => auth('customer')->id() ?? null,
+                'customer_id' => $customerId,
                 'coupon_id' => $this->appliedCoupon?->id,
                 'subtotal' => $subtotal,
                 'discount_amount' => $discountAmount,
@@ -218,55 +162,64 @@ class CheckoutPage extends Component
                 'customer_notes' => $this->customerNotes,
             ] + $shippingData);
 
-            // create order items
+            // 5. Create Order Items (Optimized SKU fetching)
             foreach ($this->cart as $item) {
+                $sku = $item['sku'] ?? null;
+
+                if (!$sku) {
+                    $sku = ($item['variant_id'] ?? null)
+                        ? \App\Models\ProductVariant::where('id', $item['variant_id'])->value('sku')
+                        : \App\Models\Product::where('id', $item['product_id'])->value('sku');
+                }
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
-                    'product_variant_id' => $item['variant_id'],
+                    'product_variant_id' => $item['variant_id'] ?? null,
                     'product_name' => $item['name'],
-                    'product_sku' => $item['variant_id']
-                        ? \App\Models\ProductVariant::find($item['variant_id'])->sku
-                        : \App\Models\Product::find($item['product_id'])->sku,
-                    'variant_name' => $item['variant_name'],
+                    'product_sku' => $sku,
+                    'variant_name' => $item['variant_name'] ?? null,
                     'price' => $item['price'],
                     'quantity' => $item['quantity'],
                     'subtotal' => $item['price'] * $item['quantity'],
                 ]);
             }
 
-            //record the coupon usage
-            if ($this->appliedCoupon) {
+            // 6. Apply Coupons (Only if registered user; optional based on business rules)
+            if ($this->appliedCoupon && auth('customer')->check()) {
                 $this->appliedCoupon->usages()->create([
-                    'customer_id' => auth('customer')->id(),
+                    'customer_id' => $customerId,
                     'order_id' => $order->id,
                 ]);
             }
 
             DB::commit();
 
-            // Processing the payment
             if ($this->paymentMethod === 'stripe') {
                 return $this->processStripePayment($order);
             } else {
-                // Cash on delivery
                 session()->forget('cart');
-                return redirect()->route('customer.orders.show', $order->id)
-                    ->with('success', 'Order placed successfully!');
+
+                if (auth('customer')->check()) {
+                    // Registered customers go to their account dashboard
+                    return redirect()->route('customer.orders.show', $order->id)
+                        ->with('success', 'Order placed successfully!');
+                } else {
+                    // Guests go to a public thank you page, storing the order ID temporarily in the session
+                    return redirect()->route('order.success')
+                        ->with('completed_order_id', $order->id);
+                }
             }
         } catch (\Throwable $th) {
             DB::rollBack();
-            // This will tell you EXACTLY which file and line triggered the error
-            session()->flash('error', "Error: {$th->getMessage()} in {$th->getFile()} on line {$th->getLine()}");
+            session()->flash('error', "Error: {$th->getMessage()}");
             return;
         }
     }
+
     public function applyCoupon()
     {
-        $coupon = Coupon::where('code', strtoupper($this->couponCode))
-            ->valid()
-            ->first();
-
+        $coupon = Coupon::where('code', strtoupper($this->couponCode))->valid()->first();
 
         if (!$coupon) {
             session()->flash('coupon_error', 'Invalid or expired coupon code');
@@ -277,14 +230,17 @@ class CheckoutPage extends Component
             session()->flash('coupon_error', 'You have already used this coupon');
             return;
         }
+
         $this->appliedCoupon = $coupon;
         session()->flash('coupon_success', 'Coupon applied successfully!');
     }
+
     public function removeCoupon()
     {
         $this->couponCode = '';
         $this->appliedCoupon = null;
     }
+
     public function getDiscountAmount()
     {
         if (!$this->appliedCoupon) {
@@ -296,7 +252,6 @@ class CheckoutPage extends Component
     public function render()
     {
         $addresses = collect();
-
         if (auth('customer')->check()) {
             $addresses = auth('customer')->user()->addresses;
         }
@@ -306,9 +261,7 @@ class CheckoutPage extends Component
             'subtotal' => $this->getSubtotal(),
             'shippingCost' => $this->getShippingCost(),
             'discountAmount' => $this->getDiscountAmount(),
-            'total' => $this->getSubtotal()
-                + $this->getShippingCost()
-                - $this->getDiscountAmount(),
+            'total' => $this->getSubtotal() + $this->getShippingCost() - $this->getDiscountAmount(),
         ])->layout('components.layouts.frontend');
     }
 }

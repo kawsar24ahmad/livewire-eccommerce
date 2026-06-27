@@ -48,7 +48,20 @@ class CheckoutController extends Controller
 
 
         return view('checkout.cancel', compact('order'));
+    }
 
+    public function thankYou()
+    {
+        // Retrieve the order ID from the flash session
+        $orderId = session('completed_order_id');
 
+        if (!$orderId) {
+            // Prevent users from manually typing the URL to see old orders
+            return redirect()->route('home');
+        }
+
+        $order = Order::findOrFail($orderId);
+
+        return view('frontend.checkout.thank-you', compact('order'));
     }
 }

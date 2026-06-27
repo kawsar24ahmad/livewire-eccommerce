@@ -55,7 +55,7 @@
                             @foreach($gallery as $image)
                                 <button wire:click="selectImage('{{ $image->image_path }}')"
                                     class="aspect-square rounded-lg overflow-hidden border-2 transition
-                                                                                                                                                                    {{ $selectedImage === $image->image_path ? 'border-blue-600' : 'border-gray-200 hover:border-indigo-400' }}">
+                                                                                                                                                                                    {{ $selectedImage === $image->image_path ? 'border-blue-600' : 'border-gray-200 hover:border-indigo-400' }}">
                                     <img src="{{ asset('storage/' . $image->image_path) }}" alt="{{ $product->name }}"
                                         class="w-full h-full object-cover">
                                 </button>
@@ -187,71 +187,45 @@
                     @endif
 
                     @if($product->has_variants && $product->variants->where('is_active', true)->count())
-
                         <div class="mb-8">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">
                                 Available Options
                             </h3>
 
                             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-
                                 @foreach($product->variants->where('is_active', true) as $item)
-
                                                     @php
                                                         $variantTitle = collect([
                                                             $item->color?->name,
                                                             $item->size?->name,
                                                         ])->filter()->implode(' • ');
-
                                                         $variantTitle = $variantTitle ?: 'Standard Product';
-
-                                                        $image = $item->image_path
-                                                            ? asset('storage/' . $item->image_path)
-                                                            : null;
                                                     @endphp
 
-                                                    <button type="button" wire:click="selectVariant({{ $item->id }})" class="group relative border rounded-xl overflow-hidden bg-white transition-all duration-300 hover:shadow-lg hover:-translate-y-1 text-left
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                {{ $selectedVariant == $item->id
+                                                    <button type="button" wire:click="selectVariant({{ $item->id }})" class="group relative border rounded-xl overflow-hidden bg-white text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1
+                                                                            {{ $selectedVariant == $item->id
                                     ? 'ring-2 ring-blue-500 border-blue-500 shadow-lg'
                                     : 'border-gray-200 hover:border-blue-300' }}">
 
-                                                        {{-- Image --}}
-                                                        @if ($image)
+                                                        @if($item->image_path)
                                                             <div class="aspect-square bg-gray-100 overflow-hidden">
-                                                                <img src="{{ $image }}" alt="{{ $variantTitle }}"
+                                                                <img src="{{ asset('storage/' . $item->image_path) }}" alt="{{ $variantTitle }}"
                                                                     class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
                                                             </div>
                                                         @endif
 
-
-
-
-                                                        {{-- Content --}}
                                                         <div class="p-3">
-
-                                                            {{-- Variant Name --}}
-                                                            <div class=" flex gap-2">
-                                                                <div class="flex items-center gap-2 mb-2">
-                                                                    @if($item->color)
-                                                                        <span class="w-4 h-4 rounded-full border border-gray-300"
-                                                                            style="background-color: {{ $item->color->hex_code ?? '#ddd' }}">
-                                                                        </span>
-
-
-                                                                    @endif
-                                                                </div>
-                                                                <h1 class="font-semibold text-gray-900 text-sm  line-clamp-2">
+                                                            <div class="flex items-center gap-2 mb-1">
+                                                                @if($item->color)
+                                                                    <span class="w-4 h-4 rounded-full border border-gray-300"
+                                                                        style="background-color: {{ $item->color->hex_code ?? '#ddd' }}">
+                                                                    </span>
+                                                                @endif
+                                                                <h1 class="font-semibold text-gray-900 text-sm line-clamp-2">
                                                                     {{ $variantTitle }}
                                                                 </h1>
-
                                                             </div>
 
-
-
-
-
-                                                            {{-- Standard Product --}}
                                                             @if(!$item->color && !$item->size)
                                                                 <div class="mb-2">
                                                                     <span
@@ -261,60 +235,12 @@
                                                                 </div>
                                                             @endif
 
-                                                            {{-- Price --}}
-                                                            {{-- <div class="flex items-center gap-2 mb-3">
-
-                                                                <span class="font-bold text-gray-900">
-                                                                    ৳{{ number_format($item->price, 0) }}
-                                                                </span>
-
-                                                                @if($item->compare_price && $item->compare_price > $item->price)
-                                                                <span class="text-xs text-gray-400 line-through">
-                                                                    ৳{{ number_format($item->compare_price, 0) }}
-                                                                </span>
-                                                                @endif
-
-                                                            </div> --}}
-
-                                                            {{-- Stock --}}
-                                                            {{-- @if($item->stock_quantity > 0)
-
-                                                            <div class="flex items-center">
-                                                                <span
-                                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs">
-
-                                                                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-
-                                                                    In Stock
-                                                                    @if($item->stock_quantity <= 10) ({{ $item->stock_quantity }})
-                                                                        @endif
-
-                                                                </span>
-                                                            </div>
-
-                                                            @else
-
-                                                            <div class="flex items-center">
-                                                                <span
-                                                                    class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 text-red-700 text-xs">
-
-                                                                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-
-                                                                    Out of Stock
-
-                                                                </span>
-                                                            </div>
-
-                                                            @endif --}}
 
                                                         </div>
                                                     </button>
-
                                 @endforeach
-
                             </div>
                         </div>
-
                     @endif
 
 
@@ -353,12 +279,22 @@
                         </div>
                     @endif
 
-                    <button wire:click="addToCart" @disabled($product->stock_status !== 'in_stock') class="w-full py-3 px-6 rounded-lg font-semibold text-lg transition
-                                {{ $product->stock_status === 'in_stock'
+                    <div class="flex gap-2">
+                        <button wire:click="addToCart" @disabled($product->stock_status !== 'in_stock') class="w-full py-3 px-6 rounded-lg font-semibold text-lg transition
+                                                    {{ $product->stock_status === 'in_stock'
     ? 'bg-blue-600 text-white hover:bg-indigo-700'
     : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}">
-                        {{ $product->stock_status === 'in_stock' ? 'Add to Cart' : 'Out of Stock' }}
-                    </button>
+                            {{ $product->stock_status === 'in_stock' ? 'Add to Cart' : 'Out of Stock' }}
+                        </button>
+
+                        <button wire:click="buyNow" @disabled($product->stock_status !== 'in_stock') class="w-full py-3 px-6 rounded-lg font-semibold text-lg transition
+                                                    {{ $product->stock_status === 'in_stock'
+    ? 'bg-blue-600 text-white hover:bg-indigo-700'
+    : 'bg-gray-300 text-gray-500 cursor-not-allowed' }}">
+                            Buy Now
+                        </button>
+                    </div>
+
 
                     <!-- Product meta -->
                     <div class="mt-8 border-t pt-6 space-y-3">

@@ -269,8 +269,12 @@ class OrderInfolist
                                 Section::make('Shipping Address')
                                     ->icon('heroicon-o-map-pin')
                                     ->schema([
+                                        TextEntry::make('Customer Info')->state(fn($record) => [
+                                            $record->shipping_full_name,
+                                            $record->shipping_phone,
+                                        ]),
 
-                                        TextEntry::make('shipping_full_name'),
+
 
                                         TextEntry::make('address')
                                             ->state(fn($record) => collect([

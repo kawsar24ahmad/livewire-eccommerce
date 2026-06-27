@@ -14,6 +14,7 @@ new #[Layout('components.layouts.customer')] class extends Component {
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public string $phone = '';
 
     /**
      * Handle an incoming registration request.
@@ -24,13 +25,14 @@ new #[Layout('components.layouts.customer')] class extends Component {
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . Customer::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'phone' => ['nullable'],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $user = Customer::create($validated);
+        // event(new Registered(($user = Customer::create($validated))));
 
-        event(new Registered(($user = Customer::create($validated))));
-
-       Auth::guard('customer')->login($user);
+        Auth::guard('customer')->login($user);
 
         $this->redirect(route('customer.dashboard', absolute: false), navigate: true);
     }
@@ -63,7 +65,8 @@ new #[Layout('components.layouts.customer')] class extends Component {
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
                         Full Name
                     </label>
-                    <input id="name" wire:model="name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                    <input id="name" wire:model="name" type="text" name="name" value="{{ old('name') }}" required
+                        autofocus
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                     @error('name')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -87,7 +90,7 @@ new #[Layout('components.layouts.customer')] class extends Component {
                     <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
                         Phone Number (Optional)
                     </label>
-                    <input id="phone" type="tel" name="phone" value="{{ old('phone') }}"
+                    <input id="phone" wire:model="phone" type="tel" name="phone"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                     @error('phone')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -111,23 +114,12 @@ new #[Layout('components.layouts.customer')] class extends Component {
                     <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
                         Confirm Password
                     </label>
-                    <input id="password_confirmation" wire:model="password_confirmation" type="password" name="password_confirmation" required
+                    <input id="password_confirmation" wire:model="password_confirmation" type="password"
+                        name="password_confirmation" required
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
                 </div>
 
-                <!-- Terms -->
-                <div class="mb-6">
-                    <label class="flex items-start">
-                        <input type="checkbox" required
-                            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-indigo-500 mt-1">
-                        <span class="ml-2 text-sm text-gray-600">
-                            I agree to the
-                            <a href="#" class="text-blue-600 hover:text-indigo-500">Terms and Conditions</a>
-                            and
-                            <a href="#" class="text-blue-600 hover:text-indigo-500">Privacy Policy</a>
-                        </span>
-                    </label>
-                </div>
+
 
                 <!-- Submit Button -->
                 <button type="submit"

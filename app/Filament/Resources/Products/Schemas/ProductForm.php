@@ -51,7 +51,7 @@ class ProductForm
                                         //     ]),
 
 
-                                      Select::make('category_id')
+                                        Select::make('category_id')
                                             ->relationship('category', 'name')
                                             ->searchable()
                                             ->preload()
@@ -235,32 +235,32 @@ class ProductForm
                                             ->relationship()
                                             ->schema([
                                                 Select::make('color_id')
-                                                    ->label('Color')
+                                                    ->label('color')
                                                     ->relationship('color', 'name')
                                                     ->searchable()->preload()->native(false)
                                                     ->native(false)
-    ->allowHtml()
-    ->getOptionLabelFromRecordUsing(function (Model $record) {
+                                                    ->allowHtml()
+                                                    ->getOptionLabelFromRecordUsing(function (Model $record) {
 
-        return '
-            <div style="display:flex;align-items:center;gap:8px;">
-                <span
-                    style="
-                        width:18px;
-                        height:18px;
-                        border-radius:9999px;
-                        background:' . $record->hex_code . ';
-                        border:1px solid #d1d5db;
-                        display:inline-block;
-                    ">
-                </span>
+                                                        return '
+                                                            <div style="display:flex;align-items:center;gap:8px;">
+                                                                <span
+                                                                    style="
+                                                                        width:18px;
+                                                                        height:18px;
+                                                                        border-radius:9999px;
+                                                                        background:' . $record->hex_code . ';
+                                                                        border:1px solid #d1d5db;
+                                                                        display:inline-block;
+                                                                    ">
+                                                                </span>
 
-                <span>' . e($record->name) . '</span>
+                                                                <span>' . e($record->name) . '</span>
 
 
-            </div>
-        ';
-    })
+                                                            </div>
+                                                        ';
+                                                    })
                                                     ->createOptionForm([
                                                         TextInput::make('name')->required(),
                                                         ColorPicker::make('hex_code')

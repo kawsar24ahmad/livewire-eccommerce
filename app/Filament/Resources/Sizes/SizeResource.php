@@ -21,7 +21,7 @@ class SizeResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowsPointingOut;
     protected static string | UnitEnum | null $navigationGroup = 'Catalog';
-    protected static ?string $recordTitleAttribute = 'Product Size';
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Schema $schema): Schema
     {
